@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private static PlayerController instance;
+
+    public GameObject Eyes;
+    public static PlayerController Instance
     {
-        
+        get
+        {
+            return instance;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Awake()
     {
-        
+        if (instance)
+        {
+            Destroy(instance);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
     }
 }

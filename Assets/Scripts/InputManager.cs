@@ -33,6 +33,11 @@ public class InputManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
+    private void Start()
+    {
+        LockMouse();
+    }
+
     private void Update()
     {
         rotation.x += Input.GetAxis(xAxis) * sensitivity;
@@ -41,5 +46,18 @@ public class InputManager : MonoBehaviour
 
         Quaternion xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
         Quaternion yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
+        CameraController.Instance.transform.localRotation = xQuat * yQuat;
+    }
+
+    void LockMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void UnlockMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
