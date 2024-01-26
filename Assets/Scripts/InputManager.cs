@@ -4,15 +4,42 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private static InputManager instance;
+
+    const string xAxis = "Mouse X";
+    const string yAxis = "Mouse Y";
+
+    Vector2 rotation = Vector2.zero;
+
+    [Range(0.1f, 9f)] public float sensitivity;
+
+    public static InputManager Instance
     {
-        
+        get
+        {
+            return instance;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Awake()
     {
-        
+        if (instance)
+        {
+            Destroy(instance);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+    }
+
+    private void Update()
+    {
+        rotation.x += Input.GetAxis(xAxis) * sensitivity;
+        rotation.y += Input.GetAxis(yAxis) * sensitivity;
+        rotation.y = Mathf.Clamp(rotation.y, -90f, 90f);
+
+        Quaternion xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
+        Quaternion yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
     }
 }
