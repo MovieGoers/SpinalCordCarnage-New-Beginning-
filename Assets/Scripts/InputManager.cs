@@ -19,6 +19,8 @@ public class InputManager : MonoBehaviour
     [Header("Key Bind")]
     public KeyCode jumpKey;
     public KeyCode dashKey;
+    public KeyCode shootKey;
+    public KeyCode reloadkey;
 
     public static InputManager Instance
     {
