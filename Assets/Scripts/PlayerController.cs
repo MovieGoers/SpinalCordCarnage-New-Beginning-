@@ -28,6 +28,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     public float jumpForce;
+    public int maxJumpCount;
+    int jumpCount;
+    public float jumpCountResetTime;
+    float jumpCountResetTimer;
+    bool canResetJumpCount;
+
 
     [Header("Slope")]
     public float maxSlopeAngle;
@@ -54,6 +60,13 @@ public class PlayerController : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
+    private void Start()
+    {
+        jumpCount = maxJumpCount;
+        jumpCountResetTimer = jumpCountResetTime;
+        canResetJumpCount = true;
+    }
+
     private void Update()
     {
         transform.localRotation = InputManager.Instance.xQuat;
@@ -76,15 +89,32 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             rigidBody.drag = groundDrag;
+            if (canResetJumpCount)
+                ResetJump();
         }
         else
         {
             rigidBody.drag = airDrag;
         }
 
-        if (Input.GetKeyDown(InputManager.Instance.jumpKey) && isGrounded)
+        if (Input.GetKeyDown(InputManager.Instance.jumpKey) && jumpCount > 0)
         {
             Jump();
+            canResetJumpCount = false;
+        }
+
+        if(jumpCountResetTimer > 0 && !canResetJumpCount)
+        {
+            jumpCountResetTimer -= Time.deltaTime;
+        }
+
+        if(jumpCountResetTimer <= 0)
+        {
+            if (!canResetJumpCount)
+            {
+                canResetJumpCount = true;
+                jumpCountResetTimer = jumpCountResetTime;
+            }
         }
     }
 
@@ -116,7 +146,14 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
+        rigidBody.velocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
         rigidBody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        jumpCount -= 1;
+    }
+
+    void ResetJump()
+    {
+        jumpCount = maxJumpCount;
     }
 
     bool IsOnSlope()
@@ -128,8 +165,6 @@ public class PlayerController : MonoBehaviour
 
             // 플레이어가 닿은 땅의 angle 구하기.
             float groundAngle = Vector3.Angle(Vector3.up, slopeGameObject.transform.up);
-
-            Debug.Log(groundAngle);
 
             if (5f < groundAngle && groundAngle < maxSlopeAngle)
                 return true;
