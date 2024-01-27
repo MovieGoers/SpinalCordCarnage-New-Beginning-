@@ -18,6 +18,10 @@ public class GunManager : MonoBehaviour
 
     [Header("Gun Movement")]
     public float mouseInputMultiplier;
+    public float bobMultiplier;
+    public float bobSpeed;
+    float sincosInput;
+    Vector3 originalGunHolderPos;
 
 
     RaycastHit raycastHit;
@@ -45,12 +49,17 @@ public class GunManager : MonoBehaviour
     {
         isReloaded = true;
         reloadTimer = reloadTime;
+        sincosInput = 0;
+
+        originalGunHolderPos = gunHolder.transform.localPosition;
     }
 
     private void Update()
     {
         animator.SetBool("isReloading", !isReloaded);
         gunHolder.transform.localRotation = Quaternion.Slerp(gunHolder.transform.localRotation, GetSwayRotation(), Time.deltaTime * 10f);
+
+        gunHolder.transform.localPosition = Vector3.Slerp(gunHolder.transform.localPosition, GetBobPosition() + originalGunHolderPos, Time.deltaTime * 10f);
 
         if (Input.GetKeyDown(InputManager.Instance.shootKey) && isReloaded)
         {
@@ -92,5 +101,23 @@ public class GunManager : MonoBehaviour
         Quaternion xQuat = Quaternion.AngleAxis(InputManager.Instance.inputXY.x * -1 * mouseInputMultiplier, Vector3.up);
         Quaternion yQuat = Quaternion.AngleAxis(InputManager.Instance.inputXY.y * -1 * mouseInputMultiplier, Vector3.left);
         return xQuat * yQuat;
+    }
+
+    Vector3 GetBobPosition()
+    {
+        sincosInput += Time.deltaTime * bobSpeed;
+
+        float groundedValue;
+
+        if (PlayerController.Instance.isGrounded)
+            groundedValue = 1;
+        else
+            groundedValue = 0;
+
+        Vector3 bobPosition = Vector3.zero;
+        bobPosition.x = Mathf.Sin(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.normalized.magnitude;
+        bobPosition.y = Mathf.Cos(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.normalized.magnitude;
+
+        return bobPosition;
     }
 }

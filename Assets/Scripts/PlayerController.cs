@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     Vector3 moveDirection;
 
-    bool isGrounded;
+    public bool isGrounded;
     bool isOnSlope;
 
     enum State
