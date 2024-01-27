@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection;
 
     bool isGrounded;
+    bool isOnSlope;
 
     [Header("Ground Check")]
     public float groundCheckingRadius;
@@ -26,6 +27,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     public float jumpForce;
+
+    [Header("Slope")]
+    public float maxSlopeAngle;
+    GameObject slopeGameObject;
 
     public static PlayerController Instance
     {
@@ -54,9 +59,17 @@ public class PlayerController : MonoBehaviour
         float horizontalInput = InputManager.Instance.horizontalInput;
         float verticalInput = InputManager.Instance.VerticalInput;
 
+        // 플레이어 이동 방향에 대한 normal vector 구하기.
         moveDirection = transform.forward * verticalInput + transform.right * horizontalInput;
+        moveDirection.Normalize();
 
         isGrounded = IsGrounded();
+        isOnSlope = IsOnSlope();
+
+        if (isOnSlope)
+            rigidBody.useGravity = false;
+        else
+            rigidBody.useGravity = true;
 
         if (isGrounded)
         {
@@ -73,11 +86,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void MovePlayer()
+    {
+        if(isOnSlope)
+            rigidBody.AddForce(GetVectorOnSlope(moveDirection) * speedNormal, ForceMode.Force);
+        else
+            rigidBody.AddForce(moveDirection * speedNormal, ForceMode.Force);
+    }
+
     private void FixedUpdate()
     {
-        rigidBody.AddForce(moveDirection * speedNormal, ForceMode.Force);
-
-
+        MovePlayer();
     }
 
     void OnDrawGizmos()
@@ -94,5 +113,35 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         rigidBody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    bool IsOnSlope()
+    {
+        Collider[] col = Physics.OverlapSphere(groundChecker.transform.position, groundCheckingRadius);
+        if(col.Length != 0)
+        {
+            slopeGameObject = col[0].gameObject;
+
+            // 플레이어가 닿은 땅의 angle 구하기.
+            float groundAngle = Vector3.Angle(Vector3.up, slopeGameObject.transform.up);
+
+            Debug.Log(groundAngle);
+
+            if (5f < groundAngle && groundAngle < maxSlopeAngle)
+                return true;
+        }
+        return false;
+    }
+
+    Vector3 GetVectorOnSlope(Vector3 vector)
+    {
+        Vector3 newVector;
+
+        if (isOnSlope)
+            newVector = Vector3.ProjectOnPlane(vector, slopeGameObject.transform.up).normalized;
+        else
+            newVector = vector;
+
+        return newVector;
     }
 }
