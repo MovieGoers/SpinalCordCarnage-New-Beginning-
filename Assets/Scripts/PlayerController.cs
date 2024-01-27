@@ -24,12 +24,14 @@ public class PlayerController : MonoBehaviour
     public float speedNormal;
     public float groundDrag;
     public float airDrag;
+    public float airSpeedRatio;
 
     [Header("Jump")]
     public float jumpForce;
 
     [Header("Slope")]
     public float maxSlopeAngle;
+    public float slopeSpeedRatio;
     GameObject slopeGameObject;
 
     public static PlayerController Instance
@@ -89,9 +91,11 @@ public class PlayerController : MonoBehaviour
     void MovePlayer()
     {
         if(isOnSlope)
-            rigidBody.AddForce(GetVectorOnSlope(moveDirection) * speedNormal, ForceMode.Force);
-        else
+            rigidBody.AddForce(GetVectorOnSlope(moveDirection) * speedNormal * slopeSpeedRatio, ForceMode.Force);
+        else if(isGrounded)
             rigidBody.AddForce(moveDirection * speedNormal, ForceMode.Force);
+        else
+            rigidBody.AddForce(moveDirection * speedNormal * airSpeedRatio, ForceMode.Force);
     }
 
     private void FixedUpdate()
