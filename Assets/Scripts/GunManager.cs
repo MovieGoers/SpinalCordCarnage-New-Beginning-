@@ -6,14 +6,19 @@ public class GunManager : MonoBehaviour
 {
     private static GunManager instance;
 
-    public GameObject winchester;
+    public GameObject gunHolder;
 
     public Animator animator;
 
+    [Header("Gun Mechanism")]
     public float gunDamage;
     public float reloadTime;
     public float reloadTimer;
     public bool isReloaded;
+
+    [Header("Gun Movement")]
+    public float mouseInputMultiplier;
+
 
     RaycastHit raycastHit;
     public static GunManager Instance
@@ -45,6 +50,7 @@ public class GunManager : MonoBehaviour
     private void Update()
     {
         animator.SetBool("isReloading", !isReloaded);
+        gunHolder.transform.localRotation = Quaternion.Slerp(gunHolder.transform.localRotation, GetSwayRotation(), Time.deltaTime * 10f);
 
         if (Input.GetKeyDown(InputManager.Instance.shootKey) && isReloaded)
         {
@@ -78,5 +84,13 @@ public class GunManager : MonoBehaviour
     void ShootEnemy(GameObject Enemy)
     {
         Enemy.gameObject.GetComponent<EnemyScript>().AddHP(-1 * gunDamage);
+    }
+
+    Quaternion GetSwayRotation()
+    {
+        // 마우스가 움직이는 반대 방향의 Quaternion 반환.
+        Quaternion xQuat = Quaternion.AngleAxis(InputManager.Instance.inputXY.x * -1 * mouseInputMultiplier, Vector3.up);
+        Quaternion yQuat = Quaternion.AngleAxis(InputManager.Instance.inputXY.y * -1 * mouseInputMultiplier, Vector3.left);
+        return xQuat * yQuat;
     }
 }

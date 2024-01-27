@@ -9,12 +9,13 @@ public class InputManager : MonoBehaviour
     const string xAxis = "Mouse X";
     const string yAxis = "Mouse Y";
 
-    Vector2 rotation = Vector2.zero;
+    public Vector2 rotation = Vector2.zero;
 
     [Range(0.1f, 9f)] public float sensitivity;
 
     public float horizontalInput, VerticalInput;
     public Quaternion xQuat, yQuat;
+    public Vector2 inputXY;
 
     [Header("Key Bind")]
     public KeyCode jumpKey;
@@ -49,8 +50,11 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        rotation.x += Input.GetAxis(xAxis) * sensitivity;
-        rotation.y += Input.GetAxis(yAxis) * sensitivity;
+        inputXY.x = Input.GetAxis(xAxis);
+        inputXY.y = Input.GetAxis(yAxis);
+
+        rotation.x += inputXY.x * sensitivity;
+        rotation.y += inputXY.y * sensitivity;
         rotation.y = Mathf.Clamp(rotation.y, -90f, 90f);
 
         xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
