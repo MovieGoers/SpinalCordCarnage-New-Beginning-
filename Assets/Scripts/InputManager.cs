@@ -16,6 +16,9 @@ public class InputManager : MonoBehaviour
     public float horizontalInput, VerticalInput;
     public Quaternion xQuat, yQuat;
 
+    [Header("Key Bind")]
+    public KeyCode jumpKey;
+
     public static InputManager Instance
     {
         get
@@ -49,8 +52,6 @@ public class InputManager : MonoBehaviour
 
         xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
         yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
-
-
 
         horizontalInput = Input.GetAxisRaw("Horizontal");
         VerticalInput = Input.GetAxisRaw("Vertical");

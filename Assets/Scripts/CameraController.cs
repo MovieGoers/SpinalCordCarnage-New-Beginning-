@@ -27,7 +27,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        transform.position = PlayerController.Instance.Eyes.transform.position;
+        transform.position = PlayerController.Instance.eyes.transform.position;
 
         Quaternion xQuat, yQuat;
         xQuat = InputManager.Instance.xQuat;
