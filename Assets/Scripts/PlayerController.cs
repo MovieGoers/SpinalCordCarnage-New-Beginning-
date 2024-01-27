@@ -16,6 +16,15 @@ public class PlayerController : MonoBehaviour
     bool isGrounded;
     bool isOnSlope;
 
+    enum State
+    {
+        running,
+        dashing,
+        air
+    }
+
+    State state;
+
     [Header("Ground Check")]
     public float groundCheckingRadius;
     public LayerMask whatIsGround;
@@ -34,6 +43,15 @@ public class PlayerController : MonoBehaviour
     float jumpCountResetTimer;
     bool canResetJumpCount;
 
+    [Header("Dash")]
+    public float dashSideForce;
+    public float dashUpForce;
+    public float dashCooltime;
+    public float dashStateTime;
+    float dashCoolTimer;
+    float dashStateTimer;
+    bool canDash;
+    bool isDashing;
 
     [Header("Slope")]
     public float maxSlopeAngle;
@@ -64,7 +82,9 @@ public class PlayerController : MonoBehaviour
     {
         jumpCount = maxJumpCount;
         jumpCountResetTimer = jumpCountResetTime;
+        dashStateTimer = dashStateTime;
         canResetJumpCount = true;
+        canDash = true;
     }
 
     private void Update()
@@ -86,7 +106,11 @@ public class PlayerController : MonoBehaviour
         else
             rigidBody.useGravity = true;
 
-        if (isGrounded)
+        if (isDashing)
+        {
+            rigidBody.drag = 0;
+        }
+        else if (isGrounded)
         {
             rigidBody.drag = groundDrag;
             if (canResetJumpCount)
@@ -115,6 +139,59 @@ public class PlayerController : MonoBehaviour
                 canResetJumpCount = true;
                 jumpCountResetTimer = jumpCountResetTime;
             }
+        }
+
+        if (Input.GetKeyDown(InputManager.Instance.dashKey) && moveDirection.magnitude > 0.1f && canDash)
+        {
+            Dash();
+            canDash = false;
+            isDashing = true;
+        }
+
+        if(!canDash && dashCoolTimer > 0)
+        {
+            dashCoolTimer -= Time.deltaTime;
+        }
+
+        if(dashCoolTimer <= 0)
+        {
+            if (!canDash)
+            {
+                canDash = true;
+                dashCoolTimer = dashCooltime;
+            }
+        }
+
+        if(isDashing && dashStateTimer > 0)
+        {
+            dashStateTimer -= Time.deltaTime;
+        }
+
+        if(dashStateTimer <= 0)
+        {
+            if (isDashing)
+            {
+                isDashing = false;
+                dashStateTimer = dashStateTime;
+            }
+        }
+
+        HandleState();
+    }
+
+    void HandleState()
+    {
+        if (isDashing) 
+        {
+            state = State.dashing;
+        }
+        else if (isGrounded)
+        {
+            state = State.running;
+        }
+        else
+        {
+            state = State.air;
         }
     }
 
@@ -182,5 +259,11 @@ public class PlayerController : MonoBehaviour
             newVector = vector;
 
         return newVector;
+    }
+
+    void Dash()
+    {
+        rigidBody.velocity = new Vector3(0, 0, 0);
+        rigidBody.AddForce(moveDirection * dashSideForce + transform.up * dashUpForce, ForceMode.Impulse);
     }
 }
