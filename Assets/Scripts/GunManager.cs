@@ -72,7 +72,9 @@ public class GunManager : MonoBehaviour
 
                 }
             }
+
             isReloaded = false;
+            animator.SetTrigger("isShooting");
         }
 
         if (!isReloaded && reloadTimer > 0)
