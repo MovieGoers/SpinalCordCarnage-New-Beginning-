@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     private static PlayerController instance;
 
     public GameObject Eyes;
+
+    public Rigidbody rigidBody;
     public static PlayerController Instance
     {
         get
@@ -25,5 +27,10 @@ public class PlayerController : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(this.gameObject);
+    }
+
+    private void Update()
+    {
+        transform.localRotation = InputManager.Instance.xQuat;
     }
 }

@@ -28,5 +28,11 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         transform.position = PlayerController.Instance.Eyes.transform.position;
+
+        Quaternion xQuat, yQuat;
+        xQuat = InputManager.Instance.xQuat;
+        yQuat = InputManager.Instance.yQuat;
+
+        transform.localRotation = xQuat * yQuat;
     }
 }

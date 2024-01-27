@@ -13,6 +13,9 @@ public class InputManager : MonoBehaviour
 
     [Range(0.1f, 9f)] public float sensitivity;
 
+    public float horizontalInput, VerticalInput;
+    public Quaternion xQuat, yQuat;
+
     public static InputManager Instance
     {
         get
@@ -44,9 +47,13 @@ public class InputManager : MonoBehaviour
         rotation.y += Input.GetAxis(yAxis) * sensitivity;
         rotation.y = Mathf.Clamp(rotation.y, -90f, 90f);
 
-        Quaternion xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
-        Quaternion yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
-        CameraController.Instance.transform.localRotation = xQuat * yQuat;
+        xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
+        yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
+
+
+
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        VerticalInput = Input.GetAxisRaw("Vertical");
     }
 
     void LockMouse()
