@@ -7,11 +7,13 @@ public class GunManager : MonoBehaviour
     private static GunManager instance;
 
     public GameObject gunHolder;
+    public GameObject gun;
 
-    public Animator animator;
+    public Animator anim;
 
     [Header("Gun Mechanism")]
     public float gunDamage;
+    public float leverActionSpeed;
     public float reloadTime;
     public float reloadTimer;
     public bool isReloaded;
@@ -56,7 +58,6 @@ public class GunManager : MonoBehaviour
 
     private void Update()
     {
-        animator.SetBool("isReloading", !isReloaded);
         gunHolder.transform.localRotation = Quaternion.Slerp(gunHolder.transform.localRotation, GetSwayRotation(), Time.deltaTime * 10f);
 
         gunHolder.transform.localPosition = Vector3.Slerp(gunHolder.transform.localPosition, GetBobPosition() + originalGunHolderPos, Time.deltaTime * 10f);
@@ -73,22 +74,8 @@ public class GunManager : MonoBehaviour
                 }
             }
 
-            isReloaded = false;
-            animator.SetTrigger("isShooting");
-        }
-
-        if (!isReloaded && reloadTimer > 0)
-        {
-            reloadTimer -= Time.deltaTime;
-        }
-
-        if (reloadTimer <= 0)
-        {
-            if (!isReloaded)
-            {
-                isReloaded = true;
-                reloadTimer = reloadTime;
-            }
+            anim.Play("Winchester_Shoot");
+            //isReloaded = false;
         }
     }
 
@@ -117,7 +104,6 @@ public class GunManager : MonoBehaviour
             groundedValue = 0;
 
         Vector3 bobPosition = Vector3.zero;
-        bobPosition.x = Mathf.Sin(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.normalized.magnitude;
         bobPosition.y = Mathf.Cos(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.normalized.magnitude;
 
         return bobPosition;
