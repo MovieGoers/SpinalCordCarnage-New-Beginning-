@@ -13,10 +13,13 @@ public class GunManager : MonoBehaviour
 
     [Header("Gun Mechanism")]
     public float gunDamage;
-    public float leverActionSpeed;
-    public float reloadTime;
-    public float reloadTimer;
-    public bool isReloaded;
+    public float maxGunAmmo;
+    float gunAmmo;
+    public float gunShootResetTime;
+    public float gunReloadTime;
+    bool isGunReset;
+    bool isGunReloaded;
+
 
     [Header("Gun Movement")]
     public float mouseInputMultiplier;
@@ -49,21 +52,34 @@ public class GunManager : MonoBehaviour
 
     private void Start()
     {
-        isReloaded = true;
-        reloadTimer = reloadTime;
+        isGunReloaded = true;
+        isGunReset = true;
         sincosInput = 0;
+        gunAmmo = maxGunAmmo;
+        UIManager.Instance.SetAmmoText("AMMO\n" + gunAmmo);
 
         originalGunHolderPos = gunHolder.transform.localPosition;
     }
 
     private void Update()
     {
+        UIManager.Instance.SetAmmoText("AMMO\n" + gunAmmo);
+        // sway, bob weapon
         gunHolder.transform.localRotation = Quaternion.Slerp(gunHolder.transform.localRotation, GetSwayRotation(), Time.deltaTime * 10f);
-
         gunHolder.transform.localPosition = Vector3.Slerp(gunHolder.transform.localPosition, GetBobPosition() + originalGunHolderPos, Time.deltaTime * 10f);
 
-        if (Input.GetKeyDown(InputManager.Instance.shootKey) && isReloaded)
+        if(Input.GetKeyDown(InputManager.Instance.reloadkey) && gunAmmo != maxGunAmmo && isGunReloaded)
         {
+            isGunReloaded = false;
+            anim.Play("Winchester_BeforeReloading");
+            Invoke("ReloadGun", gunReloadTime - 1);
+
+        }
+
+        if (Input.GetKeyDown(InputManager.Instance.shootKey) && isGunReset && isGunReloaded)
+        {
+            isGunReset = false;
+
             bool isHit = Physics.Raycast(PlayerController.Instance.eyes.transform.position, PlayerController.Instance.eyes.transform.forward, out raycastHit, 50f);
             if (isHit)
             {
@@ -73,12 +89,31 @@ public class GunManager : MonoBehaviour
 
                 }
             }
+            gunAmmo -= 1;
 
             anim.Play("Winchester_Shoot");
-            //isReloaded = false;
+
+            if (gunAmmo <= 0)
+            {
+                isGunReloaded = false;
+                anim.SetTrigger("TriggerGunReload");
+                Invoke("ReloadGun", gunReloadTime);
+            }
+
+            Invoke("ResetGunShoot", gunShootResetTime);
         }
     }
 
+    void ReloadGun()
+    {
+        gunAmmo = maxGunAmmo;
+        isGunReloaded = true;
+    }
+    
+    void ResetGunShoot()
+    {
+        isGunReset = true;
+    }
     void ShootEnemy(GameObject Enemy)
     {
         Enemy.gameObject.GetComponent<EnemyScript>().AddHP(-1 * gunDamage);
