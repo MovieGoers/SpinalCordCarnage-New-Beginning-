@@ -64,7 +64,7 @@ public class EnemyScript : MonoBehaviour
         GameObject newProjectile = Instantiate(projectile);
         newProjectile.transform.position = transform.position;
 
-        newProjectile.GetComponent<EnemyProjectileScript>().isOriginal = false;
+        newProjectile.SetActive(true);
         newProjectile.GetComponent<EnemyProjectileScript>().direction = (PlayerController.Instance.transform.position - transform.position).normalized;
         newProjectile.GetComponent<EnemyProjectileScript>().speed = attackProjectileSpeed;
         newProjectile.GetComponent<EnemyProjectileScript>().lifetime = attackProjectileLifetime;

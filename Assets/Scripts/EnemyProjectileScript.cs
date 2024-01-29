@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemyProjectileScript : MonoBehaviour
 {
-    public bool isOriginal;
     public float speed;
     public float pushForce;
     public Vector3 direction;
@@ -26,8 +25,7 @@ public class EnemyProjectileScript : MonoBehaviour
 
         if(lifeTimer <= 0)
         {
-            if(!isOriginal)
-                Destroy(this.gameObject);
+             Destroy(this.gameObject);
         }
     }
 
