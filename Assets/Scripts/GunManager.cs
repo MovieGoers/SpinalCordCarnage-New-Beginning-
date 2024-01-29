@@ -100,7 +100,7 @@ public class GunManager : MonoBehaviour
             if (gunAmmo <= 0)
             {
                 isGunReloaded = false;
-                anim.SetTrigger("TriggerGunReload");
+                anim.SetTrigger("TriggerReload");
                 Invoke("ReloadGun", gunReloadTime);
             }
 
@@ -110,8 +110,8 @@ public class GunManager : MonoBehaviour
 
     void ReloadGun()
     {
-        gunAmmo = maxGunAmmo;
         isGunReloaded = true;
+        gunAmmo = maxGunAmmo;
     }
     
     void ResetGunShoot()
@@ -137,7 +137,7 @@ public class GunManager : MonoBehaviour
 
         float groundedValue;
 
-        if (PlayerController.Instance.isGrounded)
+        if (PlayerController.Instance.isGrounded && PlayerController.Instance.rigidBody.velocity.magnitude > 0.1f)
             groundedValue = 1;
         else
             groundedValue = 0;
