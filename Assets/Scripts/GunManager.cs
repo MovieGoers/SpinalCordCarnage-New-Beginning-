@@ -137,13 +137,13 @@ public class GunManager : MonoBehaviour
 
         float groundedValue;
 
-        if (PlayerController.Instance.isGrounded && PlayerController.Instance.rigidBody.velocity.magnitude > 0.1f)
+        if (PlayerController.Instance.isGrounded)
             groundedValue = 1;
         else
             groundedValue = 0;
 
         Vector3 bobPosition = Vector3.zero;
-        bobPosition.y = Mathf.Cos(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.normalized.magnitude;
+        bobPosition.y = Mathf.Cos(sincosInput) * bobMultiplier * groundedValue * PlayerController.Instance.rigidBody.velocity.magnitude;
 
         return bobPosition;
     }
