@@ -11,8 +11,11 @@ public class GunManager : MonoBehaviour
 
     public Animator anim;
 
+    public LayerMask enemyLayerMask;
+
     [Header("Gun Mechanism")]
     public float gunDamage;
+    public float gunMaxRange;
     public float maxGunAmmo;
     float gunAmmo;
     public float gunShootResetTime;
@@ -79,10 +82,11 @@ public class GunManager : MonoBehaviour
         if (Input.GetKeyDown(InputManager.Instance.shootKey) && isGunReset && isGunReloaded)
         {
             isGunReset = false;
-
-            bool isHit = Physics.Raycast(PlayerController.Instance.eyes.transform.position, PlayerController.Instance.eyes.transform.forward, out raycastHit, 50f);
+            
+            bool isHit = Physics.Raycast(CameraController.Instance.transform.position, CameraController.Instance.transform.forward, out raycastHit, gunMaxRange);
             if (isHit)
             {
+                Debug.Log(raycastHit.collider.gameObject.name);
                 if (raycastHit.collider.CompareTag("Enemy"))
                 {
                     ShootEnemy(raycastHit.collider.gameObject);
