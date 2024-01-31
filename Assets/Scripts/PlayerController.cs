@@ -178,16 +178,6 @@ public class PlayerController : MonoBehaviour
 
         HandleState();
     }
-/*
-    private void OnTriggerEnter(Collider other)
-    {
-        GameObject go = other.gameObject;
-        if (go.CompareTag("Enemy Projectile"))
-        {
-            rigidBody.AddForce(go.GetComponent<EnemyProjectileScript>().direction * go.GetComponent<EnemyProjectileScript>().pushForce, ForceMode.Impulse);
-            Destroy(go);
-        }
-    }*/
 
     void HandleState()
     {
